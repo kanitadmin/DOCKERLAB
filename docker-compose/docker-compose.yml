@@ -10,8 +10,9 @@ services:
       - '80:80'
     volumes:
       - /home/web/:/var/www/html
-      - web-config:/etc/nginx
-      - web-log:/var/log/nginx
+      - web-config:/etc/apache2
+      - web-log:/var/log/apache2
+      - php-config:/usr/local/etc/php
   mariadb:
     image: mariadb
     container_name: mariadb
@@ -42,5 +43,6 @@ networks:
 volumes:
   web-log:
   web-config:
+  php-config:
   db-data:
   db-config:
