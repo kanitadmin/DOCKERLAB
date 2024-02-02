@@ -1,20 +1,19 @@
 version: '3.8'
 services:
   web:
-    image: nginx:latest
+    image: bucchub/php-apache:8.2
     container_name: web
     restart: always
     environment:
       TZ: 'Asia/Bangkok'
     ports:
       - '80:80'
-      - '443:443'
     volumes:
-      - web-data:/var/www/html
+      - /home/web/:/var/www/html
       - web-config:/etc/nginx
       - web-log:/var/log/nginx
   mariadb:
-    image: mariadb:11.1
+    image: mariadb
     container_name: mariadb
     restart: always
     volumes:
@@ -39,7 +38,7 @@ services:
       - 8081:80
 networks:
   default:
-    name: web
+    name: web-net
 volumes:
   web-log:
   web-config:
