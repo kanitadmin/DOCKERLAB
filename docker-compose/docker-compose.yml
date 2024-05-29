@@ -1,48 +1,67 @@
-version: '3.8'
 services:
-  web:
-    image: bucchub/php-apache:8.2
-    container_name: web
-    restart: always
-    environment:
-      TZ: 'Asia/Bangkok'
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    restart: unless-stopped
     ports:
       - '80:80'
-    volumes:
-      - /home/web/:/var/www/html
-      - web-config:/etc/apache2
-      - web-log:/var/log/apache2
-      - php-config:/usr/local/etc/php
-  mariadb:
-    image: mariadb
-    container_name: mariadb
-    restart: always
-    volumes:
-      - db-data:/var/lib/mysql
-      - db-config:/etc/mysql/conf.d
     environment:
-      TZ: 'Asia/Bangkok'
-      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
-    ports:
-      - 3306:3306
+      - TZ=Asia/Bangkok
+      - WORDPRESS_DB_HOST=db:3306
+      - WORDPRESS_DB_USER=$MYSQL_USER
+      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
+      - WORDPRESS_DB_NAME=wordpress
+    volumes:
+      - wordpress:/var/www/html
+      - wordpress-config:/etc/apache2
+    networks:
+      - wordpress-network
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.2.31:514"
+        tag: "wordpress"
+      
+  db:
+    image: mariadb:latest
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Bangkok
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+      - MYSQL_USER=$MYSQL_USER
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_DATABASE=wordpress
+    volumes:
+      - db:/var/lib/mysql
+      - db-config:/etc/mysql/conf.d
+    networks:
+      - wordpress-network
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.2.31:514"
+        tag: "mariadb"
+      
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     restart: always
     environment:
-      TZ: 'Asia/Bangkok'
-      PMA_HOST: mariadb
-      PMA_PORT: 3306
-      PMA_ARBITRARY: 0
-      UPLOAD_LIMIT: 1024M
+      - TZ=Asia/Bangkok
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_ARBITRARY=0
+      - UPLOAD_LIMIT=1024M
     ports:
       - 8081:80
-networks:
-  default:
-    name: web-net
+    networks:
+      - wordpress-network
 volumes:
-  web-log:
-  web-config:
-  php-config:
-  db-data:
+  wordpress:
+  wordpress-config:
+  db:
   db-config:
+
+networks:
+  wordpress-network:
