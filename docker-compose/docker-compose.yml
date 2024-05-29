@@ -19,7 +19,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "tcp://10.5.2.31:514"
+        syslog-address: "tcp://127.0.0.1:514"
         tag: "wordpress"
       
   db:
@@ -40,7 +40,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "tcp://10.5.2.31:514"
+        syslog-address: "tcp://127.0.0.1:514"
         tag: "mariadb"
       
   phpmyadmin:
