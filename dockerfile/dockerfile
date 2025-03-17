@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-bullseye
+FROM php:8.2-fpm
 LABEL maintainer="Kanit Tura <kanitt@buu.ac.th>"
 ENV TZ=Asia/Bangkok
 
@@ -19,7 +19,6 @@ RUN sed -ri -e 's|upload_max_filesize = 2M|upload_max_filesize = ${PHP_UPLOAD_MA
 RUN sed -ri -e 's|max_input_time = 60|max_input_time = ${PHP_MAX_INPUT_TIME}|g' "$PHP_INI_DIR/php.ini"
 RUN sed -ri -e 's|;date.timezone =|date.timezone = "Asia/Bangkok"|g' "$PHP_INI_DIR/php.ini"
 RUN sed -ri -e 's|;sys_temp_dir = "/tmp"|sys_temp_dir = "/tmp"|g' "$PHP_INI_DIR/php.ini"
-RUN sed -ri -e 's|MinProtocol = TLSv1.2|MinProtocol = TLSv1.0|g' "/etc/ssl/openssl.cnf"
 
 RUN apt-get update && apt-get -y upgrade && apt-get -y install apt-transport-https wget nano cron iputils-ping
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
